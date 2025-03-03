@@ -13,6 +13,8 @@ block content
         label(for="text") Текст обращения:
         textarea(name="text", id="text", rows="5", required)
 
-      button(type="submit") Создать обращение
-         a(href="/all_appeal")
+      // Контейнер для кнопок
+      .buttons-container
+        button(type="submit") Создать обращение
+        a(href="/all_appeal")
           button(type="button") Вернуться к списку
