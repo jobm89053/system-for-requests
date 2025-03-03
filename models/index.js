@@ -4,7 +4,8 @@ const config = require('../config/config.json').development;
 const sequelize = new Sequelize(config.database, config.username, config.password, {
   host: config.host,
   dialect: config.dialect,
-});
+  timezone: '+03:00' // Укажите ваш часовой пояс
+  });
 
 const Request = sequelize.define('requests', {
   id: {

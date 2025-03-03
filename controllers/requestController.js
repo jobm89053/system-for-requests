@@ -16,14 +16,19 @@ const getAllRequests = async (req, res) => {
     const whereClause = {};
 
     if (date) {
+      // Фильтрация по конкретной дате
       whereClause.createdAt = {
-        [Op.like]: `%${date}%`, // Фильтрация по конкретной дате
+        [Op.like]: `%${date}%`, // Используем LIKE для поиска по дате
       };
     }
 
     if (startDate && endDate) {
+      // Фильтрация по диапазону дат (обе даты включительно)
       whereClause.createdAt = {
-        [Op.between]: [new Date(startDate), new Date(endDate + 'T23:59:59')], // Фильтрация по диапазону дат
+        [Op.between]: [
+          new Date(startDate + 'T00:00:00'), // Начальная дата с началом дня (00:00:00)
+          new Date(endDate + 'T23:59:59'), // Конечная дата с концом дня (23:59:59)
+        ],
       };
     }
 

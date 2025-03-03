@@ -76,6 +76,7 @@ router.post('/appeal_solution/:appeal_id/complete', async (req, res, next) => {
   try {
     const appealId = req.params.appeal_id;
     const { solution } = req.body;
+    
 
     // Обновляем статус обращения на "Завершено" и добавляем решение
     await Request.update(

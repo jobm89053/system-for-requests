@@ -1,6 +1,8 @@
 const express = require('express');
 const { sequelize } = require('./models');
 const requestController = require('./controllers/requestController');
+const appealSolutionRouter = require('./routes/appeal_solution');
+const appealDetailsRouter = require('./routes/appeal_details'); // Добавьте эту строку
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,6 +23,13 @@ app.get('/create_appeal', (req, res) => {
   res.render('create_appeal', { title: 'Создать обращение' }); // Форма создания обращения
 });
 app.post('/create_appeal', requestController.create_appeal); // Обработка создания обращения
+
+// Подключение маршрутов из appeal_solution.js
+app.use('/', appealSolutionRouter);
+
+
+// Подключение маршрутов из appeal_details.js
+app.use('/appeal_details', appealDetailsRouter); // Добавьте эту строку
 
 // Главная страница
 app.get('/', (req, res) => {

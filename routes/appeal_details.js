@@ -1,30 +1,33 @@
 const express = require('express');
-const { Request } = require('../models');
 const router = express.Router();
+const { Request } = require('../models'); 
 
-// Получить обращение по ID
-router.get('/:id', async (req, res) => {
+// Получить одно обращение по ID
+router.get('/appeal_details/:appeal_id', async (req, res, next) => {
   try {
-    const appealId = parseInt(req.params.id, 10); // Получаем ID из параметров URL
+    const appealId = parseInt(req.params.appeal_id, 10);
 
-    // Проверка на валидность ID
+    // Проверяем, является ли ID числом
     if (isNaN(appealId)) {
-      return res.status(400).send('Неверный ID обращения');
+      console.error(`Некорректный ID обращения: ${req.params.appeal_id}`);
+      return res.status(400).render('400', { title: 'Ошибка 400: Некорректный ID' });
     }
 
-    // Поиск обращения по ID
-    const appeal = await Request.findOne({ where: { id: appealId } });
+    // Ищем обращение по ID
+    const appeal = await Request.findByPk(appealId);
 
-    // Проверка, если обращение не найдено
     if (!appeal) {
-      return res.status(404).send('Обращение не найдено');
+      console.warn(`Обращение с ID ${appealId} не найдено`);
+      return res.status(404).render('404', { title: 'Ошибка 404: Обращение не найдено' });
     }
 
-    // Отправка данных обращения в шаблон
-    res.render('appeal_detail', { appeal });
-  } catch (error) {
-    console.error('Ошибка при получении данных обращения:', error);
-    res.status(500).render('500', { title: 'Ошибка сервера' });
+    res.render('appeal_detail', {
+      title: 'Детали обращения',
+      appeal,
+    });
+  } catch (err) {
+    console.error('Ошибка при получении обращения:', err);
+    next(err);
   }
 });
 
