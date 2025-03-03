@@ -16,7 +16,6 @@
     "url": "https://github.com/jobm89053/system-for-requests/issues"
   },
   "homepage": "https://github.com/jobm89053/system-for-requests#readme",
-  "description": "",
   "dependencies": {
     "cookie-parser": "^1.4.7",
     "express": "^4.21.2",
@@ -28,5 +27,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
-  }
+  },
+  "description": ""
 }
