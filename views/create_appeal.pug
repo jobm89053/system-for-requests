@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  .container
+    h1 Создать обращение
+
+    // Форма для создания обращения
+    form(method="POST", action="/create_appeal")
+      div.form-group
+        label(for="topic") Тема:
+        input(type="text", name="topic", id="topic", required)
+
+      div.form-group
+        label(for="text") Текст обращения:
+        textarea(name="text", id="text", rows="5", required)
+
+      div.buttons-container
+        button(type="submit") Создать
+        a(href="/all_appeal")
+          button(type="button") Вернуться к списку
