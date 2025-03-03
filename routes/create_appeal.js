@@ -13,6 +13,11 @@ router.post('/', async function (req, res, next) {
     const { topic, text } = req.body;
     console.log('Данные формы:', { topic, text });
 
+    // Проверка на наличие обязательных полей
+    if (!topic || !text) {
+      return res.status(400).json({ error: 'Тема и текст обращения обязательны' });
+    }
+
     // Создание нового обращения через Sequelize
     const newRequest = await Request.create({ topic, text });
 

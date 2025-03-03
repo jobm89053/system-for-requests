@@ -17,7 +17,10 @@ app.use(express.static('public'));
 // Маршруты для работы с обращениями
 app.get('/all_appeal', requestController.getAllRequests); // Получить все обращения
 app.get('/all_appeal/filter', requestController.getAllRequests); // Фильтрация по дате или диапазону дат
-app.post('/create_appeal', requestController.createRequest); // Создать новое обращение
+app.get('/create_appeal', (req, res) => {
+  res.render('create_appeal', { title: 'Создать обращение' }); // Форма создания обращения
+});
+app.post('/create_appeal', requestController.create_appeal); // Обработка создания обращения
 
 // Главная страница
 app.get('/', (req, res) => {

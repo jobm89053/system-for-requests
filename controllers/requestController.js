@@ -102,7 +102,7 @@ const handleAppeal = async (req, res) => {
 };
 
 // Создать новое обращение
-const createRequest = async (req, res) => {
+const create_appeal = async (req, res) => {
   try {
     const { topic, text } = req.body;
 
@@ -111,7 +111,10 @@ const createRequest = async (req, res) => {
       return res.status(400).json({ error: 'Тема и текст обращения обязательны' });
     }
 
+    // Создание нового обращения
     await Request.create({ topic, text });
+
+    // Перенаправление на страницу со всеми обращениями
     res.status(201).redirect('/all_appeal');
   } catch (error) {
     console.error('Ошибка при создании обращения:', error);
@@ -123,5 +126,5 @@ module.exports = {
   getAllRequests,
   takeOneAppeal,
   handleAppeal,
-  createRequest,
+  create_appeal, // Добавляем метод в экспорт
 };
