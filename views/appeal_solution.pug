@@ -20,13 +20,14 @@ block content
         label(for="createdAt") Дата создания:
         input(type="text", id="createdAt", value=appeal.createdAt ? appeal.createdAt.toLocaleDateString() : '—', readonly, class="readonly-input")
 
-      // Форма для решения обращения
-      form(method="POST", action=`/appeal_solution/${appeal.id}/complete`)
+      // Форма для решения или отмены обращения
+      form(method="POST", action=`/appeal_solution/${appeal.id}/handle`)
         .form-group
-          label(for="response") Решение:
-          textarea(name="response", id="response", placeholder="Введите решение", required, class="narrow-textarea")
+          label(for="response") Решение/Причина отмены:
+          textarea(name="response", id="response", placeholder="Введите решение или причину отмены", required, class="narrow-textarea")
         .buttons-container
-          button(type="submit") Завершить обращение
+          button(type="submit", name="action", value="complete") Завершить обращение
+          button(type="submit", name="action", value="cancel") Отменить обращение
           a(href="/all_appeal")
             button(type="button") Вернуться к списку обращений
     else

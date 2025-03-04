@@ -1,6 +1,6 @@
 const express = require('express');
 const { sequelize } = require('./models');
-const requestController = require('./controllers/requestController');
+const requestController = require('./controllers/requestController'); // Ваш контроллер для обращений
 const appealSolutionRouter = require('./routes/appeal_solution');
 const appealDetailsRouter = require('./routes/appeal_details');
 
@@ -24,10 +24,20 @@ app.post('/create_appeal', requestController.create_appeal);
 
 // Маршрут для отмены всех обращений "В работе"
 app.post('/cancel_all_in_progress', requestController.cancelAllInProgress);
+app.post('/appeal_solution/:id/cancel', requestController.cancelAppeal);
+app.post('/appeal_solution/:id/handle', requestController.cancelAppeal)
+// Создаем экземпляр роутера для cancelAppeal
+const router = express.Router();
+// Импортируем cancelAppeal из requestController
+const { cancelAppeal } = require('./controllers/requestController');
+router.post('/appeal_solution/:id/cancel', cancelAppeal);
 
 // Подключение маршрутов из appeal_solution.js и appeal_details.js
 app.use('/appeal_solution', appealSolutionRouter);
 app.use('/appeal_details', appealDetailsRouter);
+
+// Подключаем роутер cancelAppeal
+app.use('/api', router);  // Или используйте ваш префикс, если нужно
 
 app.get('/', (req, res) => {
   res.redirect('/all_appeal');

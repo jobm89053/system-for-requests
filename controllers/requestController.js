@@ -75,25 +75,6 @@ const openAppealSolutionPage = async (req, res) => {
 };
 
 // Обработать обращение (завершить/отменить/взять в работу)
-const handleAppeal = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { response, action } = req.body;
-    
-    const updateData = {
-      complete: { status: 'Завершено', solution: response },
-      cancel: { status: 'Отменено', cancellationReason: response },
-      take_to_work: { status: 'В работе' },
-    }[action];
-
-    if (!updateData) return res.status(400).json({ error: 'Неверное действие' });
-    await Request.update(updateData, { where: { id } });
-    res.redirect('/all_appeal');
-  } catch (error) {
-    console.error('Ошибка при обработке обращения:', error);
-    res.status(500).json({ error: error.message });
-  }
-};
 
 // Создать новое обращение
 const create_appeal = async (req, res) => {
@@ -127,6 +108,78 @@ const cancelAllInProgress = async (req, res, next) => {
     next(error);
   }
 };
+
+// Новый метод cancelAppeal
+const cancelAppeal = async (req, res) => {
+  try {
+    const appealId = req.params.id;
+    const { response } = req.body;  // Здесь response — это поле, где введена причина отмены или решение.
+
+    if (!response) {
+      return res.status(400).json({ error: 'Причина отмены или решение обязательно' });
+    }
+
+    // Если введен текст, то обновляем статус на "Отменено" и сохраняем причину отмены.
+    const [updatedCount] = await Request.sequelize.query(
+      'UPDATE requests SET status = "Отменено", cancellationReason = ? WHERE id = ?',
+      {
+        replacements: [response, appealId],
+        type: Request.sequelize.QueryTypes.UPDATE,
+      }
+    );
+
+    if (updatedCount === 0) {
+      return res.status(404).json({ message: 'Обращение не найдено или уже отменено' });
+    }
+
+    res.redirect('/all_appeal');  // Перенаправляем на страницу всех обращений
+  } catch (error) {
+    console.error('Ошибка при отмене обращения:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+const handleAppeal = async (req, res) => {
+  try {
+    const appealId = req.params.id;
+    const { response, action } = req.body;  // Получаем введенное решение/причину отмены и действие
+
+    if (!response) {
+      return res.status(400).json({ error: 'Текст решения или причина отмены обязательны' });
+    }
+
+    let updateData;
+
+    // В зависимости от действия, обновляем данные обращения
+    if (action === 'complete') {
+      updateData = {
+        status: 'Завершено',
+        solution: response,  // Текст решения
+      };
+    } else if (action === 'cancel') {
+      updateData = {
+        status: 'Отменено',
+        cancellationReason: response,  // Причина отмены
+      };
+    } else {
+      return res.status(400).json({ error: 'Некорректное действие' });
+    }
+
+    // Обновляем статус и решение/причину в базе данных
+    const [updatedCount] = await Request.update(updateData, { where: { id: appealId } });
+
+    if (updatedCount === 0) {
+      return res.status(404).json({ message: 'Обращение не найдено' });
+    }
+
+    // Если действие завершено или отменено, перенаправляем на страницу всех обращений
+    res.redirect('/all_appeal');
+  } catch (error) {
+    console.error('Ошибка при обработке обращения:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 module.exports = {
   getAllRequests,
   handleTakeToWork,
@@ -134,4 +187,5 @@ module.exports = {
   create_appeal,
   openAppealSolutionPage,
   cancelAllInProgress,
+  cancelAppeal, // Добавляем новый метод
 };
