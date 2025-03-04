@@ -1,33 +1,43 @@
+// appeal_details.js
 const express = require('express');
 const router = express.Router();
-const { Request } = require('../models'); 
+const { Request } = require('../models');
 
-// Получить одно обращение по ID
-router.get('/appeal_details/:appeal_id', async (req, res, next) => {
+// Получить обращение по ID с отформатированными датами
+router.get('/:appeal_id', async (req, res, next) => {
   try {
     const appealId = parseInt(req.params.appeal_id, 10);
 
-    // Проверяем, является ли ID числом
+    // Проверка на валидность ID
     if (isNaN(appealId)) {
-      console.error(`Некорректный ID обращения: ${req.params.appeal_id}`);
-      return res.status(400).render('400', { title: 'Ошибка 400: Некорректный ID' });
+      return res.status(400).send('Неверный ID обращения');
     }
 
-    // Ищем обращение по ID
-    const appeal = await Request.findByPk(appealId);
+    // Поиск обращения по ID
+    const appeal = await Request.findOne({ where: { id: appealId } });
 
+    // Проверка, если обращение не найдено
     if (!appeal) {
-      console.warn(`Обращение с ID ${appealId} не найдено`);
-      return res.status(404).render('404', { title: 'Ошибка 404: Обращение не найдено' });
+      return res.status(404).send('Обращение не найдено');
     }
 
-    res.render('appeal_detail', {
-      title: 'Детали обращения',
-      appeal,
-    });
+    // Форматируем даты для вывода в нужном формате (например, 'yyyy-mm-dd hh:mm:ss')
+    const formattedCreatedAt = appeal.createdAt ? appeal.createdAt.toISOString().slice(0, 19).replace('T', ' ') : null;
+    const formattedUpdatedAt = appeal.updatedAt ? appeal.updatedAt.toISOString().slice(0, 19).replace('T', ' ') : null;
+
+    // Создаем новый объект для ответа с отформатированными датами
+    const appealResponse = {
+      ...appeal.toJSON(),  // Сначала берем все поля обращения
+      createdAt: formattedCreatedAt,  // Добавляем отформатированную дату создания
+      updatedAt: formattedUpdatedAt,  // Добавляем отформатированную дату обновления
+    };
+
+    // Отправка данных обращения в шаблон
+    res.render('appeal_details', { appeal: appealResponse });
+    
   } catch (err) {
-    console.error('Ошибка при получении обращения:', err);
-    next(err);
+    console.error('Ошибка при получении данных обращения:', err);
+    next(err); // Передача ошибки в обработчик ошибок
   }
 });
 

@@ -36,6 +36,7 @@ block content
           tr
             td= appeal.topic
             td
+              // Сделаем текст сообщения кликабельной ссылкой
               a.appeal-text(href=`/appeal_details/${appeal.id}`)= appeal.text
             td.status-cell(data-status=appeal.status)= appeal.status
             td= appeal.createdAt ? appeal.createdAt.toLocaleDateString() : '—'
@@ -51,4 +52,4 @@ block content
       a(href="/create_appeal")
         button(type="button") Создать обращение
       form(method="POST", action="/cancel_all_in_progress")
-        button(type="submit") Отменить все в работе
+        button(type="submit" class="btn btn-danger") Отменить все "В работе"

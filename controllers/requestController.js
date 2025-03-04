@@ -55,27 +55,63 @@ const getAllRequests = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// Получить одно обращение по ID
-const takeOneAppeal = async (req, res) => {
+// requestController.js
+const handleTakeToWork = async (req, res) => {
   try {
-    const appealId = parseInt(req.params.id, 10); // Преобразуем ID в число
+    const appealId = req.params.id; // Получаем ID обращения из URL
 
-    // Проверка на валидность ID
-    if (isNaN(appealId)) {
-      return res.status(400).render('400', { title: 'Неверный ID обращения' });
-    }
+    // Найти обращение
+    const appeal = await Request.findByPk(appealId);
 
-    const appeal = await Request.findByPk(appealId); // Ищем обращение по ID
-    
     if (!appeal) {
-      return res.status(404).render('404', { title: 'Обращение не найдено' });
+      return res.status(404).send('Обращение не найдено');
     }
 
-    res.render('appeal_detail', { appeal }); // Рендерим страницу с деталями обращения
+    // Обновляем статус обращения на "В работе"
+    await Request.update({ status: 'В работе' }, { where: { id: appealId } });
+
+    // Перенаправляем пользователя на страницу решения обращения
+    res.redirect(`/appeal_solution/${appealId}`);
+  } catch (err) {
+    console.error('Ошибка при обработке запроса:', err);
+    res.status(500).send('Ошибка сервера');
+  }
+};
+// Получить одно обращение по ID
+async function takeOneAppeal(appealId) {
+  try {
+    const appeal = await Request.findOne({
+      where: { id: appealId }
+    });
+
+    return appeal;
   } catch (error) {
-    console.error('Ошибка при получении обращения:', error);
-    res.status(500).render('500', { title: 'Ошибка сервера' });
+    console.error("Error fetching appeal:", error);
+    throw error;
+  }
+}
+
+// Открыть страницу для обработки обращения
+const openAppealSolutionPage = async (req, res) => {
+  try {
+    const appealId = req.params.id; // Получаем ID из URL
+    const appeal = await Request.findByPk(appealId);
+
+    if (!appeal) {
+      return res.status(404).send('Обращение не найдено');
+    }
+
+    // Если нужно, можем обновить статус на "В работе"
+    await Request.update({ status: 'В работе' }, { where: { id: appealId } });
+
+    // Перенаправляем на страницу с решением обращения
+    res.render('appeal_solution', {
+      title: 'Решение обращения',
+      appeal, // передаем данные обращения
+    });
+  } catch (err) {
+    console.error('Ошибка при открытии страницы решения обращения:', err);
+    res.status(500).send('Ошибка сервера');
   }
 };
 
@@ -126,10 +162,31 @@ const create_appeal = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+const cancelAllInProgress = async (req, res) => {
+  try {
+    // Обновляем все обращения, которые находятся "В работе", переводим их в "Отменено"
+    const updatedCount = await Request.update(
+      { status: 'Отменено', cancellationReason: 'Массовая отмена' }, // Правильное обновление
+      { where: { status: 'В работе' } } // Условие выбора записей
+    );
+
+    if (updatedCount[0] === 0) {
+      return res.status(404).json({ message: 'Нет обращений в работе' });
+    }
+
+    res.redirect('/all_appeal'); // Перенаправление на список обращений
+  } catch (error) {
+    console.error('Ошибка при отмене всех обращений в работе:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
 
 module.exports = {
   getAllRequests,
   takeOneAppeal,
   handleAppeal,
-  create_appeal, // Добавляем метод в экспорт
+  create_appeal,
+  openAppealSolutionPage,
+  handleTakeToWork,
+  cancelAllInProgress, // Добавляем новую функцию
 };

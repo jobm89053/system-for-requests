@@ -1,8 +1,9 @@
 const express = require('express');
 const { sequelize } = require('./models');
 const requestController = require('./controllers/requestController');
-const appealSolutionRouter = require('./routes/appeal_solution');
-const appealDetailsRouter = require('./routes/appeal_details'); // Добавьте эту строку
+const appealSolutionRouter = require('./routes/appeal_solution'); // Маршруты для решения обращений
+const appealDetailsRouter = require('./routes/appeal_details'); // Маршруты для деталей обращения
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,11 +26,10 @@ app.get('/create_appeal', (req, res) => {
 app.post('/create_appeal', requestController.create_appeal); // Обработка создания обращения
 
 // Подключение маршрутов из appeal_solution.js
-app.use('/', appealSolutionRouter);
-
+app.use('/appeal_solution', appealSolutionRouter);
 
 // Подключение маршрутов из appeal_details.js
-app.use('/appeal_details', appealDetailsRouter); // Добавьте эту строку
+app.use('/appeal_details', appealDetailsRouter); // Подключаем маршруты для деталей обращения
 
 // Главная страница
 app.get('/', (req, res) => {
@@ -45,6 +45,8 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).render('500', { title: 'Ошибка сервера' });
 });
+
+app.post('/cancel_all_in_progress', requestController.cancelAllInProgress);
 
 // Синхронизация с базой данных и запуск сервера
 sequelize.sync()
