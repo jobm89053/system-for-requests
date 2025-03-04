@@ -3,7 +3,6 @@ const router = express.Router();
 const { Request } = require('../models');
 const { Op } = require('sequelize');
 
-// Получить все обращения с фильтрацией и пагинацией
 router.get('/all_appeal', async (req, res, next) => {
   try {
     const { date, startDate, endDate, page = 1, limit = 10 } = req.query;
@@ -49,7 +48,6 @@ router.get('/all_appeal', async (req, res, next) => {
   }
 });
 
-// Получить одно обращение по ID
 router.get('/appeal_detail/:appeal_id', async (req, res, next) => {
   try {
     const appealId = req.params.appeal_id;

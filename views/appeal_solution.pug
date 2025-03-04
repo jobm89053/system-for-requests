@@ -2,7 +2,7 @@ extends layout
 
 block content
   .container
-    h1 Решение обращения
+    h1 Решение обращения №#{appeal.id}
     if appeal
       .form-group
         label(for="topic") Тема:
@@ -19,8 +19,6 @@ block content
       .form-group
         label(for="createdAt") Дата создания:
         input(type="text", id="createdAt", value=appeal.createdAt ? appeal.createdAt.toLocaleDateString() : '—', readonly, class="readonly-input")
-
-      // Форма для решения или отмены обращения
       form(method="POST", action=`/appeal_solution/${appeal.id}/handle`)
         .form-group
           label(for="response") Решение/Причина отмены:
