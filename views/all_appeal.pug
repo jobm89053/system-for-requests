@@ -51,5 +51,5 @@ block content
     .buttons-container
       a(href="/create_appeal")
         button(type="button") Создать обращение
-      form(method="POST", action="/cancel_all_in_progress")
-        button(type="submit" class="btn btn-danger") Отменить все "В работе"
+      form(action="/cancel_all_in_progress", method="POST")
+       button(type="submit") Отменить все в работе
