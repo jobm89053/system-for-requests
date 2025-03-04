@@ -52,4 +52,14 @@ block content
       a(href="/create_appeal")
         button(type="button") Создать обращение
       form(action="/cancel_all_in_progress", method="POST")
-       button(type="submit") Отменить все в работе
+        button(type="submit") Отменить все в работе
+
+    // Пагинация
+    if totalPages > 1
+      .pagination
+        if currentPage > 1
+          a(href=`/all_appeal?page=${currentPage - 1}`) Назад
+        each page in Array.from({ length: totalPages }, (v, k) => k + 1)
+          a(href=`/all_appeal?page=${page}`)= page
+        if currentPage < totalPages
+          a(href=`/all_appeal?page=${currentPage + 1}`) Далее

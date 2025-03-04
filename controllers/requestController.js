@@ -2,7 +2,7 @@ const { Request } = require('../models');
 const { Op } = require('sequelize');
 
 // Получить все обращения с фильтрацией и пагинацией
-const getAllRequests = async (req, res) => {
+const  getAllRequests = async (req, res) => {
   try {
     const { date, startDate, endDate, page = 1, limit = 10 } = req.query;
     const offset = (page - 1) * limit;
@@ -28,13 +28,16 @@ const getAllRequests = async (req, res) => {
       offset: parseInt(offset),
     });
 
+    const totalPages = Math.ceil(count / limit); // Общее количество страниц
+
+    // Отправляем данные в шаблон
     res.render('all_appeal', {
       appeals,
       currentDate: date || '',
       currentStartDate: startDate || '',
       currentEndDate: endDate || '',
       currentPage: parseInt(page),
-      totalPages: Math.ceil(count / limit),
+      totalPages: totalPages,  // Общее количество страниц
     });
   } catch (error) {
     console.error('Ошибка при получении обращений:', error);
