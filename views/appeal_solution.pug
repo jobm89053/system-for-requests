@@ -4,14 +4,30 @@ block content
   .container
     h1 Решение обращения
     if appeal
-      p Тема: #{appeal.topic}
-      p Текст: #{appeal.text}
-      p Статус: #{appeal.status}
-      p Дата создания: #{appeal.createdAt ? appeal.createdAt.toLocaleDateString() : '—'}
-      // Добавьте форму для решения обращения
+      .form-group
+        label(for="topic") Тема:
+        input(type="text", id="topic", value=appeal.topic, readonly, class="readonly-input")
+
+      .form-group
+        label(for="text") Текст:
+        textarea(id="text", readonly, class="readonly-textarea")= appeal.text
+
+      .form-group
+        label(for="status") Статус:
+        input(type="text", id="status", value=appeal.status, readonly, class="readonly-input")
+
+      .form-group
+        label(for="createdAt") Дата создания:
+        input(type="text", id="createdAt", value=appeal.createdAt ? appeal.createdAt.toLocaleDateString() : '—', readonly, class="readonly-input")
+
+      // Форма для решения обращения
       form(method="POST", action=`/appeal_solution/${appeal.id}/complete`)
-        textarea(name="response", placeholder="Введите решение")
-        button(type="submit") Завершить обращение
+        .form-group
+          label(for="response") Решение:
+          textarea(name="response", id="response", placeholder="Введите решение", required, class="narrow-textarea")
+        .buttons-container
+          button(type="submit") Завершить обращение
+          a(href="/all_appeal")
+            button(type="button") Вернуться к списку обращений
     else
       p Обращение не найдено
-    a(href="/all_appeal") Вернуться к списку обращений
