@@ -19,7 +19,7 @@ block content
       .form-group
         label(for="createdAt") Дата создания:
         input(type="text", id="createdAt", value=appeal.createdAt ? appeal.createdAt.toLocaleDateString() : '—', readonly, class="readonly-input")
-      form(method="POST", action=`/appeal_solution/${appeal.id}/handle`)
+      form(method="POST", action=`/all_appeal/${appeal.id}/handle`)
         .form-group
           label(for="response") Решение/Причина отмены:
           textarea(name="response", id="response", placeholder="Введите решение или причину отмены", required, class="narrow-textarea")

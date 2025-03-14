@@ -1,43 +1,25 @@
-const { Request } = require('../models');
-const { Op } = require('sequelize');
+const requestService = require('../services/requestService');
 
-const  getAllRequests = async (req, res) => {
+// Получение всех обращений
+const getAllRequests = async (req, res) => {
   try {
     const { date, startDate, endDate, page = 1, limit = 10 } = req.query;
-    const offset = (page - 1) * limit;
-
-    if (isNaN(page) || isNaN(limit)) {
-      return res.status(400).json({ error: 'Некорректные параметры пагинации' });
-    }
-
-    const whereClause = {};
-    if (date) {
-      whereClause.createdAt = { 
-        [Op.between]: [new Date(date).setHours(0, 0, 0, 0), new Date(date).setHours(23, 59, 59, 999)] 
-      };
-    } else if (startDate && endDate) {
-      whereClause.createdAt = {
-        [Op.between]: [new Date(`${startDate}T00:00:00`), new Date(`${endDate}T23:59:59`)],
-      };
-    }
-
-    const { rows: appeals, count } = await Request.findAndCountAll({
-      where: whereClause,
-      attributes: ['id', 'topic', 'text', 'status', 'createdAt'],
-      order: [['createdAt', 'DESC']],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
+    const { appeals, count, totalPages } = await requestService.getAllRequests({
+      date,
+      startDate,
+      endDate,
+      page,
+      limit,
     });
 
-    const totalPages = Math.ceil(count / limit); 
-
     res.render('all_appeal', {
+      title: 'system-for-handling-requests',
       appeals,
       currentDate: date || '',
       currentStartDate: startDate || '',
       currentEndDate: endDate || '',
       currentPage: parseInt(page),
-      totalPages: totalPages, 
+      totalPages,
     });
   } catch (error) {
     console.error('Ошибка при получении обращений:', error);
@@ -45,27 +27,25 @@ const  getAllRequests = async (req, res) => {
   }
 };
 
-const handleTakeToWork = async (req, res) => {
+// Создание нового обращения
+const create_appeal = async (req, res) => {
   try {
-    const appealId = req.params.id;
-    const appeal = await Request.findByPk(appealId);
+    const { topic, text } = req.body;
+    if (!topic || !text) return res.status(400).json({ error: 'Тема и текст обязательны' });
 
-    if (!appeal) return res.status(404).send('Обращение не найдено');
-
-    await appeal.update({ status: 'В работе' });
-    res.redirect(`/appeal_solution/${appealId}`);
+    await requestService.createAppeal({ topic, text });
+    res.redirect('/all_appeal');
   } catch (error) {
-    console.error('Ошибка при взятии обращения в работу:', error);
-    res.status(500).send('Ошибка сервера');
+    console.error('Ошибка при создании обращения:', error);
+    res.status(500).json({ error: error.message });
   }
 };
 
+// Страница решения обращения
 const openAppealSolutionPage = async (req, res) => {
   try {
     const appealId = req.params.id;
-    const appeal = await Request.findByPk(appealId);
-
-    if (!appeal) return res.status(404).send('Обращение не найдено');
+    const appeal = await requestService.getAppealById(appealId);
 
     await appeal.update({ status: 'В работе' });
     res.render('appeal_solution', { title: 'Решение обращения', appeal });
@@ -75,71 +55,90 @@ const openAppealSolutionPage = async (req, res) => {
   }
 };
 
-const create_appeal = async (req, res) => {
+// Взятие обращения в работу
+const handleTakeToWork = async (req, res) => {
   try {
-    const { topic, text } = req.body;
-    if (!topic || !text) return res.status(400).json({ error: 'Тема и текст обязательны' });
-
-    await Request.create({ topic, text });
-    res.status(201).redirect('/all_appeal');
+    const appealId = req.params.id;
+    await requestService.updateAppealStatus(appealId, 'В работе');
+    res.redirect(`/all_appeal/${appealId}/solution`);
   } catch (error) {
-    console.error('Ошибка при создании обращения:', error);
-    res.status(500).json({ error: error.message });
+    console.error('Ошибка при взятии обращения в работу:', error);
+    res.status(500).send('Ошибка сервера');
   }
 };
 
-const cancelAllInProgress = async (req, res, next) => {
+// Завершение обращения
+const handleAppeal = async (req, res) => {
   try {
-    const [updatedCount] = await Request.update(
-      { status: 'Отменено', cancellationReason: 'Массовая отмена' },
-      { where: { status: 'В работе' } }
-    );
+    const appealId = req.params.id;
+    const { action, response } = req.body;
 
-    if (updatedCount === 0) {
-      return res.status(404).json({ message: 'Нет обращений в работе' });
+    // Проверка существования обращения
+    const appeal = await requestService.getAppealById(appealId);
+    if (!appeal) {
+      return res.status(404).send('Обращение не найдено');
     }
 
+    // Обработка действий
+    if (action === 'complete') {
+      // Завершение обращения
+      await requestService.updateAppealStatus(appealId, 'Завершено');
+    } else if (action === 'cancel') {
+      // Отмена обращения
+      if (!response) {
+        return res.status(400).json({ error: 'Причина отмены обязательна' });
+      }
+      await requestService.updateAppealStatus(appealId, 'Отменено', response);
+    } else {
+      return res.status(400).json({ error: 'Неверное действие' });
+    }
+
+    // Перенаправление пользователя на страницу со всеми обращениями
+    res.redirect('/all_appeal');
+  } catch (error) {
+    console.error('Ошибка при завершении/отмене обращения:', error);
+    res.status(500).send('Ошибка сервера');
+  }
+};
+
+
+// Отмена всех обращений "В работе"
+const cancelAllInProgress = async (req, res) => {
+  try {
+    await requestService.cancelAllInProgress();
     res.redirect('/all_appeal');
   } catch (error) {
     console.error('Ошибка при отмене всех обращений в работе:', error);
-    next(error);
-  }
-};
-
-const cancelAppeal = async (req, res) => {
-  try {
-    const appealId = req.params.id;
-    const { response } = req.body;  
-
-    if (!response) {
-      return res.status(400).json({ error: 'Причина отмены или решение обязательно' });
-    }
-
-    const [updatedCount] = await Request.sequelize.query(
-      'UPDATE requests SET status = "Отменено", cancellationReason = ? WHERE id = ?',
-      {
-        replacements: [response, appealId],
-        type: Request.sequelize.QueryTypes.UPDATE,
-      }
-    );
-
-    if (updatedCount === 0) {
-      return res.status(404).json({ message: 'Обращение не найдено или уже отменено' });
-    }
-
-    res.redirect('/all_appeal');  
-  } catch (error) {
-    console.error('Ошибка при отмене обращения:', error);
     res.status(500).json({ error: error.message });
   }
 };
 
+// Детали обращения
+const getAppealDetails = async (req, res) => {
+  try {
+    const appealId = req.params.appeal_id;
+    const appeal = await requestService.getAppealById(appealId);
+
+    // Форматирование дат
+    const formattedCreatedAt = appeal.createdAt.toISOString().slice(0, 19).replace('T', ' ');
+    const formattedUpdatedAt = appeal.updatedAt.toISOString().slice(0, 19).replace('T', ' ');
+
+    res.render('appeal_details', {
+      appeal: { ...appeal.toJSON(), createdAt: formattedCreatedAt, updatedAt: formattedUpdatedAt },
+    });
+  } catch (error) {
+    console.error('Ошибка при получении деталей обращения:', error);
+    res.status(500).send('Ошибка сервера');
+  }
+};
+
+
 module.exports = {
   getAllRequests,
-  handleTakeToWork,
-  //handleAppeal,
   create_appeal,
   openAppealSolutionPage,
+  handleTakeToWork,
+  handleAppeal,
   cancelAllInProgress,
-  cancelAppeal, 
+  getAppealDetails, 
 };
