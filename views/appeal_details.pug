@@ -1,0 +1,39 @@
+extends layout
+
+block content
+  .container
+    .appeal-details
+      h1 Детали обращения №#{appeal.id}
+
+      p
+        strong Тема:
+        | #{appeal.topic}
+
+      p
+        strong Текст обращения:
+        | #{appeal.text}
+
+      p
+        strong Статус:
+        | #{appeal.status}
+
+      p
+        strong Дата создания:
+        | #{appeal.createdAt}
+
+      p
+        strong Дата обновления:
+        | #{appeal.updatedAt}
+
+      p
+        strong Решение / Причина отказа:
+        if appeal.status === 'Завершено'
+          | #{appeal.solution || '—'}
+        else if appeal.status === 'Отменено'
+          | #{appeal.cancellationReason || '—'}
+        else
+          | —
+
+    .buttons-container
+      a(href="/all_appeal")
+        button(type="button") Вернуться к списку обращений

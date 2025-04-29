@@ -1,0 +1,33 @@
+{
+  "name": "1",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jobm89053/system-for-requests.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jobm89053/system-for-requests/issues"
+  },
+  "homepage": "https://github.com/jobm89053/system-for-requests#readme",
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "express": "^4.21.2",
+    "http-errors": "^2.0.0",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.12.0",
+    "pug": "^3.0.3",
+    "sequelize": "^6.37.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  },
+  "keywords": [],
+  "description": ""
+}

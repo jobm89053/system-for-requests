@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  .container
+    h1 Решение обращения №#{appeal.id}
+    if appeal
+      .form-group
+        label(for="topic") Тема:
+        input(type="text", id="topic", value=appeal.topic, readonly, class="readonly-input")
+
+      .form-group
+        label(for="text") Текст:
+        textarea(id="text", readonly, class="readonly-textarea")= appeal.text
+
+      .form-group
+        label(for="status") Статус:
+        input(type="text", id="status", value=appeal.status, readonly, class="readonly-input")
+
+      .form-group
+        label(for="createdAt") Дата создания:
+        input(type="text", id="createdAt", value=appeal.createdAt ? appeal.createdAt.toLocaleDateString() : '—', readonly, class="readonly-input")
+      form(method="POST", action=`/all_appeal/${appeal.id}/handle`)
+        .form-group
+          label(for="response") Решение/Причина отмены:
+          textarea(name="response", id="response", placeholder="Введите решение или причину отмены", required, class="narrow-textarea")
+        .buttons-container
+          button(type="submit", name="action", value="complete") Завершить обращение
+          button(type="submit", name="action", value="cancel") Отменить обращение
+          a(href="/all_appeal")
+            button(type="button") Вернуться к списку обращений
+    else
+      p Обращение не найдено

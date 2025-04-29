@@ -1,0 +1,247 @@
+/* Общие стили для body и контейнера */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  padding: 20px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+}
+
+/* Заголовок */
+h1 {
+  color: #333;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Стили для формы */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  margin-left: 30px; /* Отступ для label */
+}
+
+/* Стили для input */
+input[type="text"] {
+  width: calc(100% - 60px); /* Ширина минус отступы по 30px с каждой стороны */
+  margin: 0 30px; /* Отступы слева и справа */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  outline: none; /* Убираем выделение при клике */
+}
+
+/* Стили для неактивных input (readonly) */
+.readonly-input {
+  background-color: #f9f9f9; /* Светлый фон для неактивных полей */
+  color: #333; /* Цвет текста */
+}
+
+/* Стили для textarea */
+textarea {
+  width: calc(100% - 60px); /* Ширина минус отступы по 30px с каждой стороны */
+  margin: 0 30px; /* Отступы слева и справа */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  resize: vertical; /* Разрешаем изменение размера по вертикали */
+  outline: none; /* Убираем выделение при клике */
+}
+
+/* Стили для неактивных textarea (readonly) */
+.readonly-textarea {
+  background-color: #f9f9f9; /* Светлый фон для неактивных полей */
+  color: #333; /* Цвет текста */
+  resize: none; /* Запрещаем изменение размера */
+}
+
+/* Стили для кнопок */
+button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+/* Стили для контейнера кнопок */
+.buttons-container {
+  display: flex;
+  gap: 10px;
+  justify-content: center; /* Центрирование кнопок по горизонтали */
+  margin-top: 20px;
+  margin-bottom: 20px; /* Отступ снизу */
+}
+
+.buttons-container a button {
+  background-color: #4CAF50;
+}
+
+.buttons-container a button:hover {
+  background-color: #45a049;
+}
+
+/* Стили для контейнера фильтров */
+.filters-container {
+  display: flex;
+  gap: 15px;
+  align-items: flex-end;
+  margin-bottom: 20px;
+}
+
+.filters-container .filter-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.filters-container label {
+  margin-bottom: 5px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.filters-container input[type="date"] {
+  width: 100%;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.filters-container button {
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.filters-container button:hover {
+  background-color: #45a049;
+}
+
+/* Стили для таблицы */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table th, table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+table th {
+  background-color: #f2f2f2;
+}
+
+/* Стили для ссылок */
+a.appeal-text {
+  color: black;
+  text-decoration: none;
+}
+
+a.appeal-text:hover {
+  text-decoration: underline;
+}
+
+/* Адаптивные стили */
+@media (max-width: 768px) {
+  .buttons-container {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .buttons-container button {
+    width: 100%;
+  }
+
+  .filters-container {
+    flex-direction: column;
+  }
+
+  .filters-container .filter-item {
+    width: 100%;
+  }
+
+  input[type="text"],
+  textarea {
+    width: calc(100% - 20px); /* На мобильных устройствах поля занимают всю ширину с небольшими отступами */
+    margin: 0 10px; /* Уменьшаем отступы на мобильных устройствах */
+  }
+
+  .form-group label {
+    margin-left: 10px; /* Уменьшаем отступ для label на мобильных устройствах */
+  }
+}
+
+/* Стили для пагинации */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pagination a {
+  padding: 8px 16px;
+  background-color: #f4f4f4;
+  color: #333;
+  text-decoration: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+}
+
+.pagination a:hover {
+  background-color: #ddd;
+}
+
+.pagination a.active {
+  background-color: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
+}
+
+.pagination a:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+}
+

@@ -1,0 +1,74 @@
+extends layout
+
+block content
+  .container
+    h1 Система работы с обращениями
+
+    // Контейнер для фильтров
+    form(action="/all_appeal/filter", method="GET", id="filterForm")
+      .filters-container
+        div.filter-item
+          label(for="date") Конкретная дата:
+          input(type="date", name="date", id="date", value=currentDate)
+
+        div.filter-item
+          label(for="startDate") Начальная дата:
+          input(type="date", name="startDate", id="startDate", value=currentStartDate)
+
+        div.filter-item
+          label(for="endDate") Конечная дата:
+          input(type="date", name="endDate", id="endDate", value=currentEndDate)
+
+        div.filter-item
+          button(type="submit", class="filter-button") Применить фильтры
+          button(type="button", onclick="clearFilters()", class="filter-button") Очистить
+
+    // Список обращений
+    table
+      thead
+        tr
+          th Тема
+          th Текст
+          th Статус
+          th Дата создания
+          th Действия
+      tbody
+        each appeal in appeals
+          tr
+            td= appeal.topic
+            td
+              a.appeal-text(href=`/appeal_details/${appeal.id}`)= appeal.text
+            td.status-cell(class=`status-${appeal.status.toLowerCase()}`, data-status=appeal.status)
+              = appeal.status
+            td= appeal.createdAt ? appeal.createdAt.toLocaleDateString() : '—'
+            td
+              if appeal.status === 'Завершено' || appeal.status === 'Отменено'
+                button(type="button", disabled, class="disabled-button") Взять в работу
+              else
+                form(method="POST", action=`/all_appeal/${appeal.id}/take_to_work`, style="display: inline;")
+                  button(type="submit") Взять в работу
+
+    // Контейнер для кнопок
+    .buttons-container
+      a(href="/all_appeal/create")
+        button(type="button") Создать обращение
+      form(action="/all_appeal/cancel_all_in_progress", method="POST")
+        button(type="submit") Отменить все в работе
+
+    // Пагинация
+    if totalPages > 1
+      .pagination
+        if currentPage > 1
+          a(href=`/all_appeal?page=${currentPage - 1}`) Назад
+        each page in Array.from({ length: totalPages }, (v, k) => k + 1)
+          a(href=`/all_appeal?page=${page}`, class=(page === currentPage ? 'active-page' : ''))= page
+        if currentPage < totalPages
+          a(href=`/all_appeal?page=${currentPage + 1}`) Далее
+
+  script.
+    function clearFilters() {
+      document.getElementById('date').value = '';
+      document.getElementById('startDate').value = '';
+      document.getElementById('endDate').value = '';
+      document.getElementById('filterForm').submit();
+    }

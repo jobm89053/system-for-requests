@@ -1,0 +1,31 @@
+# Node.js
+/node_modules/
+/package-lock.json
+
+# Logs
+logs/
+*.log
+
+# Database
+db.sql
+
+# IDE and Editor Files
+.DS_Store
+.vscode/
+.idea/
+
+# OS-specific files/directories
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Compiled output
+/dist/
+/build/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Other ignored files
+.env
